@@ -8,14 +8,16 @@ install_tailscale() {
       echo_with_color $GREEN_COLOR "Tailscale has been installed successfully!"
     else
       exit_with_error "Failed to install Tailscale!"
+    fi
   else
     echo_with_color $YELLOW_COLOR "Tailscale is already installed!"
     return 1
-    fi
+  fi
 }
 
 login_tailscale() {
   read -sp "Enter your Tailscale login key: " TS_KEY
+  echo
   if ! sudo tailscale up --authkey="$TS_KEY" --operator="$USER" --accept-routes=true; then
     exit_with_error "Failed to login Tailscale!"
   fi
@@ -29,6 +31,7 @@ set_autoupdate_if_supported() {
     else
       echo_with_color $YELLOW_COLOR "Tailscale auto-update is not supported!"
     fi
+  fi
 }
 
 install_tailscale
