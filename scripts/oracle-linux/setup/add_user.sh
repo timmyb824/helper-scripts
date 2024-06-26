@@ -2,6 +2,11 @@
 
 source "$(dirname "$BASH_SOURCE")/../../../init/init.sh"
 
+# check that usernamne is provided
+if [[ -z "$1" ]]; then
+  exit_with_error "Please provide a username as an argument."
+fi
+
 # Define the username
 USERNAME="$1"
 
