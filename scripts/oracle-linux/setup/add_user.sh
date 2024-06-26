@@ -2,13 +2,8 @@
 
 source "$(dirname "$BASH_SOURCE")/../../../init/init.sh"
 
-# Check for root privileges
-if [ "$EUID" -ne 0 ]; then
-  error_exit "This script must be run as root."
-fi
-
 # Define the username
-USERNAME="tbryant"
+USERNAME="$1"
 
 # Add the user
 if id "$USERNAME" &>/dev/null; then
