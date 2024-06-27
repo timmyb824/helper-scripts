@@ -34,12 +34,13 @@ login_to_atuin() {
 }
 
 install_atuin_with_script() {
+    # Must be first in the .bashrc file to ensure that the atuin binary is available in the PATH else command not found error will occur.
+    update_bashrc
     echo_with_color "$YELLOW_COLOR" "Installing atuin with the atuin script..."
     if bash <(curl -sS https://raw.githubusercontent.com/ellie/atuin/main/install.sh); then
         echo_with_color "$GREEN_COLOR" "atuin installed successfully."
         initialize_atuin
         login_to_atuin
-        update_bashrc
     else
         echo_with_color "$RED_COLOR" "Failed to install atuin."
         exit_with_error "Failed to install atuin with the script." 1
