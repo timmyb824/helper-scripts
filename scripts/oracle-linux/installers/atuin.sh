@@ -40,6 +40,7 @@ install_atuin_with_script() {
     if bash <(curl -sS https://raw.githubusercontent.com/ellie/atuin/main/install.sh); then
         echo_with_color "$GREEN_COLOR" "atuin installed successfully."
         initialize_atuin
+        login_to_atuin
         # update_bashrc
     else
         echo_with_color "$RED_COLOR" "Failed to install atuin."
