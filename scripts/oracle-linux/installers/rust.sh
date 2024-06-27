@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # function to install rustup with error handling
 install_rustup() {

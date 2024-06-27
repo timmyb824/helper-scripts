@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # Function to install pyenv and Python dependencies for Linux
 install_pyenv_linux() {
