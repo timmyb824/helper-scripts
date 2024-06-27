@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 install_yum_packages() {
     echo_with_color "$CYAN_COLOR" "Installing yum packages..."

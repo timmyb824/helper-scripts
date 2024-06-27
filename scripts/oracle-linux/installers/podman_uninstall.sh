@@ -1,114 +1,90 @@
 #!/usr/bin/env bash
 
 # Source necessary utilities
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # Function to check if Podman is installed
 check_podman_installed() {
     if command_exists podman; then
         return 0
     else
-        echo_with_color "32" "Podman is not installed."
+        echo_with_color "$GREEN_COLOR" "Podman is not installed."
         return 1
     fi
 }
 
 # Function to uninstall Podman
 uninstall_podman() {
-    # Ensure sudo is available
-    if ! command_exists sudo; then
-        echo_with_color "31" "sudo command is required but not found. Please install sudo first."
-        return 1
-    fi
-
     # Remove Podman and its dependencies
-    if ! sudo apt remove -y podman; then
-        echo_with_color "31" "Failed to remove Podman."
+    if ! sudo yum remove -y container-tools; then
+        echo_with_color "$RED_COLOR" "Failed to remove Podman."
         return 1
     fi
 
-    # Remove the repository for Podman
-    if ! sudo rm /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list; then
-        echo_with_color "31" "Failed to remove Podman repository."
-        return 1
-    fi
-
-    # Remove the GPG key for the repository
-    if ! sudo rm /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg; then
-        echo_with_color "31" "Failed to remove the GPG key for the Podman repository."
-        return 1
-    fi
-
-    # Update the package database
-    if ! sudo apt update; then
-        echo_with_color "31" "Failed to update the package database."
-        return 1
-    fi
-
-    echo_with_color "32" "Podman uninstalled successfully."
+    echo_with_color "$GREEN_COLOR" "Podman uninstalled successfully."
 
     # Remove podman-compose
     if command_exists pip; then
         if ! pip uninstall -y podman-compose; then
-            echo_with_color "31" "Failed to uninstall podman-compose."
+            echo_with_color "$RED_COLOR" "Failed to uninstall podman-compose."
             return 1
         fi
-        echo_with_color "32" "podman-compose uninstalled successfully."
+        echo_with_color "$GREEN_COLOR" "podman-compose uninstalled successfully."
     fi
 
     # Remove Podman configurations
     local config_dir="$HOME/.config/containers"
     if [[ -d "$config_dir" ]]; then
         if ! rm -rf "$config_dir"; then
-            echo_with_color "31" "Failed to remove Podnfiguration directory."
+            echo_with_color "$RED_COLOR" "Failed to remove Podnfiguration directory."
             return 1
         fi
-        echo_with_color "32" "Podman configuration directory removed successfully."
+        echo_with_color "$GREEN_COLOR" "Podman configuration directory removed successfully."
     fi
 
     # remove systemd user unit files (if uninstalling/reinstalling leaving these may help restart the containers)
 #    local systemd_dir="$HOME/.config/systemd"
 #    if [[ -d "$systemd_dir" ]]; then
 #      if ! rm -rf "$systemd_dir"; then
-#          echo_with_color "31" "Failed to remove systemd user unit files."
+#          echo_with_color "$RED_COLOR" "Failed to remove systemd user unit files."
 #          return 1
 #      fi
-#      echo_with_color "32" "Systemd user unit files removed successfully."
+#      echo_with_color "$GREEN_COLOR" "Systemd user unit files removed successfully."
 #    fi
 
     # Disable lingering for the user
     if ! sudo loginctl disable-linger "$USER"; then
-        echo_with_color "31" "Failed to disable lingering for user $USER."
+        echo_with_color "$RED_COLOR" "Failed to disable lingering for user $USER."
         return 1
     fi
-    echo_with_color "32" "Lingering disabled for user $USER."
+    echo_with_color "$GREEN_COLOR" "Lingering disabled for user $USER."
 
     # Remove sysctl configuration for privileged ports
     local sysctl_conf="/etc/sysctl.d/podman-privileged-ports.conf"
     if [[ -f "$sysctl_conf" ]]; then
         if ! sudo rm "$sysctl_conf"; then
-            echo_with_color "31" "Failed to remove sysctl configuration for privileged ports."
+            echo_with_color "$RED_COLOR" "Failed to remove sysctl configuration for privileged ports."
             return 1
         fi
-        echo_with_color "32" "Sysctl configuration for privileged ports removed successfully."
+        echo_with_color "$GREEN_COLOR" "Sysctl configuration for privileged ports removed successfully."
     fi
 
     # Symlink removal
     if [[ -L /var/run/docker.sock ]]; then
         if ! sudo rm /var/run/docker.sock; then
-            echo_with_color "31" "Failed to remove Docker symlink."
+            echo_with_color "$RED_COLOR" "Failed to remove Docker symlink."
             return 1
         fi
-        echo_with_color "32" "Docker symlink removed successfully."
+        echo_with_color "$GREEN_COLOR" "Docker symlink removed successfully."
     fi
-    
-    echo_with_color "32" "Podman and its configurations were completely uninstalled."
+
+    echo_with_color "$GREEN_COLOR" "Podman and its configurations were completely uninstalled."
 }
 
 # Main script execution
 if check_podman_installed; then
-    echo_with_color "33" "Uninstalling Podman..."
+    echo_with_color "$YELLOW_COLOR" "Uninstalling Podman..."
     uninstall_podman
 else
-    echo_with_color "32" "Podman is not installed. Nothing to do."
+    echo_with_color "$GREEN_COLOR" "Podman is not installed. Nothing to do."
 fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # check that usernamne is provided
 if [[ -z "$1" ]]; then

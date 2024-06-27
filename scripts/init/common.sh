@@ -80,6 +80,15 @@ line_in_file() {
     grep -Fq -- "$line" "$file"
 }
 
+# Function to add a line to a file if it doesn't already exist
+add_line_to_file() {
+    local line="$1"
+    local file="$2"
+    if ! line_in_file "$line" "$file"; then
+        echo "$line" >>"$file"
+    fi
+}
+
 # Function to echo with color and newlines for visibility
 # 31=red, 32=green, 33=yellow, 34=blue, 35=purple, 36=cyan
 echo_with_color() {
