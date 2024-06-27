@@ -1,0 +1,2 @@
+Error uninstalling awk: rm: cannot remove 'gawk-{{version}}': No such file or directory
+ × Couldn’t uninstall: /home/tbryant/.local/bin/awk
