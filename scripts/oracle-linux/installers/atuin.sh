@@ -7,13 +7,11 @@ initialize_atuin() {
     add_to_path "$HOME/.atuin/bin"
 }
 
-# This is already done by the atuin install script; leaving it here for reference
-# update_bashrc() {
-#     local bashrc_file="$HOME/.bashrc"
-#     echo_with_color "$GREEN" "Updating $bashrc_file..."
-#     echo "" >> "$bashrc_file"
-#     add_line_to_file "export PATH=\"\$HOME/.atuin/bin:\$PATH\"" "$bashrc_file"
-# }
+update_bashrc() {
+    local bashrc_file="$HOME/.bashrc"
+    echo_with_color "$GREEN" "Updating $bashrc_file..."
+    add_line_to_file "export PATH=\"\$HOME/.atuin/bin:\$PATH\"" "$bashrc_file"
+}
 
 
 login_to_atuin() {
@@ -41,7 +39,7 @@ install_atuin_with_script() {
         echo_with_color "$GREEN_COLOR" "atuin installed successfully."
         initialize_atuin
         login_to_atuin
-        # update_bashrc
+        update_bashrc
     else
         echo_with_color "$RED_COLOR" "Failed to install atuin."
         exit_with_error "Failed to install atuin with the script." 1
