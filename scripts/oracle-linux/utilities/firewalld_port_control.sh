@@ -30,7 +30,7 @@ check_firewalld() {
 add_port() {
   local port=$1
   local zone=$2
-  firewall-cmd --zone="$zone" --add-port="$port" --permanent
+  sudo firewall-cmd --zone="$zone" --add-port="$port" --permanent
   if [ $? -eq 0 ]; then
     echo_with_color $GREEN "Successfully added port $port to zone $zone."
     firewall-cmd --reload
@@ -43,7 +43,7 @@ add_port() {
 remove_port() {
   local port=$1
   local zone=$2
-  firewall-cmd --zone="$zone" --remove-port="$port" --permanent
+  sudo firewall-cmd --zone="$zone" --remove-port="$port" --permanent
   if [ $? -eq 0 ]; then
     echo_with_color $GREEN "Successfully removed port $port from zone $zone."
     firewall-cmd --reload
@@ -56,7 +56,7 @@ remove_port() {
 list_ports() {
   local zone=$1
   echo_with_color $GREEN "Open ports in zone $zone:"
-  firewall-cmd --zone="$zone" --list-ports
+  sudo firewall-cmd --zone="$zone" --list-ports
   if [ $? -ne 0 ]; then
     echo_with_color $RED "Failed to list ports for zone $zone."
   fi
