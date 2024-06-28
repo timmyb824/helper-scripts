@@ -43,10 +43,38 @@ create_promtail_user() {
     echo_with_color "$GREEN" "Promtail user found."
 }
 
-add_promtail_to_adm_group() {
-    echo_with_color "$GREEN" "Adding promtail user to the adm group..."
-    sudo usermod -aG adm promtail || echo_with_color "$RED" "Failed to add promtail user to the adm group."
-    echo_with_color "$GREEN" "Added promtail user to the adm group."
+set_promtail_acls() {
+    local user="promtail"
+    local group="promtail"
+    local logrotate_conf="/etc/logrotate.d/Promtail_ACLs"
+
+    echo_with_color "$GREEN" "Setting ACLs and logrotate configuration for $user..."
+
+    # Ensure the group exists
+    if ! getent group "$group" > /dev/null; then
+        sudo groupadd "$group" || { echo_with_color "$RED_COLOR" "Failed to create group $group"; return 1; }
+    fi
+
+    # Add the user to the group
+    sudo usermod -aG "$group" "$user" || { echo_with_color "$RED_COLOR" "Failed to add user $user to group $group"; return 1; }
+
+    # Set ACLs for the log files
+    sudo setfacl -m g:$group:rx /var/log/cron
+    sudo setfacl -m g:$group:rx /var/log/messages
+    sudo setfacl -m g:$group:rx /var/log/secure
+
+    # Add logrotate configuration
+    sudo tee "$logrotate_conf" > /dev/null <<EOL
+{
+    postrotate
+        /usr/bin/setfacl -m g:$group:rx /var/log/cron
+        /usr/bin/setfacl -m g:$group:rx /var/log/messages
+        /usr/bin/setfacl -m g:$group:rx /var/log/secure
+    endscript
+}
+EOL
+
+    echo_with_color "$GREEN_COLOR" "ACLs set and logrotate configuration added for $user."
 }
 
 configure_promtail() {
@@ -95,6 +123,35 @@ configure_promtail() {
 EOF
 }
 
+upgrade_promtail() {
+    local version=$1
+    local deb_file="promtail-${version}.aarch64.rpm"
+    local download_url="https://github.com/grafana/loki/releases/download/v${version}/${deb_file}"
+
+    echo_with_color "$GREEN" "Starting Promtail upgrade..."
+
+    # Downloading Promtail .deb package
+    echo_with_color "$GREEN" "Downloading Promtail version ${version}..."
+    if ! wget "${download_url}" -O "${deb_file}" 2>/dev/null; then
+        echo_with_color "$RED" "Failed to download Promtail .deb package"
+        return 1
+    fi
+    echo_with_color "$GREEN" "Download complete."
+
+    # Install the downloaded .deb package
+    echo_with_color "$GREEN" "Installing Promtail..."
+    if ! sudo yum install -y "${deb_file}"; then
+        echo_with_color "$RED" "Failed to install Promtail"
+    else
+        echo_with_color "$GREEN" "Promtail upgrade completed successfully."
+    fi
+
+    # Cleanup downloaded package
+    echo_with_color "$GREEN" "Cleaning up..."
+    rm "${deb_file}"
+    echo_with_color "$GREEN" "Cleanup complete."
+}
+
 restart_promtail() {
     echo_with_color "$GREEN" "Restarting Promtail..."
     sudo systemctl daemon-reload || echo_with_color "$RED" "Failed to reload systemd."
@@ -107,11 +164,18 @@ if ! command_exists promtail; then
 
     create_promtail_user
 
-    add_promtail_to_adm_group
+    set_promtail_acls
 
     configure_promtail "http://logging.tailebee.ts.net:3100/loki/api/v1/push"
 
     restart_promtail
 else
-    echo_with_color "$YELLOW" "Promtail is already installed. Skipping installation..."
+    # check if the installed version is the same as the desired version
+    if [ "$(promtail --version | grep 'promtail, version' | awk '{print $3}')" != "$PROMTAIL_VERSION" ]; then
+        echo_with_color "$YELLOW" "Promtail is already installed but the version is different."
+        upgrade_promtail "$PROMTAIL_VERSION"
+        restart_promtail
+    else
+        echo_with_color "$GREEN" "Promtail is already installed and up-to-date."
+    fi
 fi

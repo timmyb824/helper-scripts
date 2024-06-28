@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source necessary utilities
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # Function to uninstall Promtail
 uninstall_promtail() {
@@ -9,7 +9,7 @@ uninstall_promtail() {
 
     # Remove Promtail package
     echo_with_color "$GREEN" "Removing Promtail package..."
-    if ! sudo yum remove promtail; then
+    if ! sudo yum remove -y promtail; then
         echo_with_color "$RED" "Failed to remove Promtail package"
         return 1
     fi
@@ -20,6 +20,23 @@ remove_promtail_user() {
     echo_with_color "$GREEN" "Removing promtail user..."
     sudo userdel promtail || echo_with_color "$RED" "Failed to remove promtail user."
     echo_with_color "$GREEN" "Removed promtail user."
+}
+
+undo_promtail_acls() {
+    local group="promtail"
+    local logrotate_conf="/etc/logrotate.d/Promtail_ACLs"
+
+    # Remove ACLs for the log files
+    sudo setfacl -x g:$group /var/log/cron
+    sudo setfacl -x g:$group /var/log/messages
+    sudo setfacl -x g:$group /var/log/secure
+
+    # Remove logrotate configuration
+    if [ -f "$logrotate_conf" ]; then
+        sudo rm -f "$logrotate_conf" || { echo_with_color "$RED_COLOR" "Failed to remove logrotate configuration $logrotate_conf"; return 1; }
+    fi
+
+    echo_with_color "$GREEN_COLOR" "ACLs removed and logrotate configuration deleted for $group."
 }
 
 stop_promtail() {
@@ -47,6 +64,9 @@ if command_exists promtail; then
 
     # Remove promtail user from the adm group
     remove_promtail_user
+
+    # Undo ACLs and logrotate configuration
+    # undo_promtail_acls
 
     # Cleanup Promtail-related files and directories
     cleanup_promtail
