@@ -68,6 +68,7 @@ set_promtail_acls() {
     sudo setfacl -m g:$group:rx /var/log/cron
     sudo setfacl -m g:$group:rx /var/log/messages
     sudo setfacl -m g:$group:rx /var/log/secure
+    sudo setfacl -m g:$group:rx /var/log/fail2ban.log
 
     # Add logrotate configuration
     sudo tee "$logrotate_conf" >/dev/null <<EOL
@@ -76,6 +77,7 @@ set_promtail_acls() {
         /usr/bin/setfacl -m g:$group:rx /var/log/cron
         /usr/bin/setfacl -m g:$group:rx /var/log/messages
         /usr/bin/setfacl -m g:$group:rx /var/log/secure
+        /usr/bin/setfacl -m g:$group:rx /var/log/fail2ban.log
     endscript
 }
 EOL
@@ -127,6 +129,14 @@ configure_promtail() {
         labels:
           job: syslog
           __path__: /var/log/secure
+
+    - job_name: system
+      static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: fail2ban
+          __path__: /var/log/fail2ban.log
 
 EOF
 }
