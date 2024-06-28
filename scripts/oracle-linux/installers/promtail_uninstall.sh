@@ -66,7 +66,7 @@ if command_exists promtail; then
     remove_promtail_user
 
     # Undo ACLs and logrotate configuration
-    # undo_promtail_acls
+    undo_promtail_acls
 
     # Cleanup Promtail-related files and directories
     cleanup_promtail

@@ -51,12 +51,18 @@ set_promtail_acls() {
     echo_with_color "$GREEN" "Setting ACLs and logrotate configuration for $user..."
 
     # Ensure the group exists
-    if ! getent group "$group" > /dev/null; then
-        sudo groupadd "$group" || { echo_with_color "$RED_COLOR" "Failed to create group $group"; return 1; }
+    if ! getent group "$group" >/dev/null; then
+        sudo groupadd "$group" || {
+            echo_with_color "$RED_COLOR" "Failed to create group $group"
+            return 1
+        }
     fi
 
     # Add the user to the group
-    sudo usermod -aG "$group" "$user" || { echo_with_color "$RED_COLOR" "Failed to add user $user to group $group"; return 1; }
+    sudo usermod -aG "$group" "$user" || {
+        echo_with_color "$RED_COLOR" "Failed to add user $user to group $group"
+        return 1
+    }
 
     # Set ACLs for the log files
     sudo setfacl -m g:$group:rx /var/log/cron
@@ -64,7 +70,7 @@ set_promtail_acls() {
     sudo setfacl -m g:$group:rx /var/log/secure
 
     # Add logrotate configuration
-    sudo tee "$logrotate_conf" > /dev/null <<EOL
+    sudo tee "$logrotate_conf" >/dev/null <<EOL
 {
     postrotate
         /usr/bin/setfacl -m g:$group:rx /var/log/cron
@@ -87,7 +93,7 @@ configure_promtail() {
     fi
 
     # Use your function echo_with_color if it's defined, or just echo otherwise
-    if command -v echo_with_color &> /dev/null; then
+    if command -v echo_with_color &>/dev/null; then
         echo_with_color "$GREEN" "Configuring Promtail..."
     else
         echo "Configuring Promtail..."
@@ -97,7 +103,7 @@ configure_promtail() {
     sudo cp /etc/promtail/config.yml /etc/promtail/config.yml.bak
 
     # Write the new Promtail configuration to the file
-    sudo tee /etc/promtail/config.yml > /dev/null <<EOF
+    sudo tee /etc/promtail/config.yml >/dev/null <<EOF
     server:
       http_listen_port: 9080
       grpc_listen_port: 0
@@ -119,6 +125,14 @@ configure_promtail() {
         labels:
           job: syslog
           __path__: /var/log/messages
+
+    - job_name: system
+      static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          __path__: /var/log/secure
 
 EOF
 }
