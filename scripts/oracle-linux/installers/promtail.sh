@@ -6,7 +6,6 @@ source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 # Function to install Promtail
 install_promtail() {
     local version=$1
-    promtail-2.9.8.aarch64.rpm
     local deb_file="promtail-${version}.aarch64.rpm"
     local download_url="https://github.com/grafana/loki/releases/download/v${version}/${deb_file}"
 
@@ -96,8 +95,6 @@ configure_promtail() {
 EOF
 }
 
-
-# create function restart promtail
 restart_promtail() {
     echo_with_color "$GREEN" "Restarting Promtail..."
     sudo systemctl restart promtail || echo_with_color "$RED" "Failed to restart Promtail."
@@ -105,19 +102,14 @@ restart_promtail() {
 }
 
 if ! command_exists promtail; then
-    # Install Promtail
     install_promtail "$PROMTAIL_VERSION"
 
-    # Create promtail user
     create_promtail_user
 
-    # Add promtail user to the adm group
     add_promtail_to_adm_group
 
-    # Configure Promtail
-    configure_promtail "https://loki.timmybtech.com/loki/api/v1/push"
+    configure_promtail "http://logging.tailebee.ts.net:3100/loki/api/v1/push"
 
-    # Restart Promtail
     restart_promtail
 else
     echo_with_color "$YELLOW" "Promtail is already installed. Skipping installation..."

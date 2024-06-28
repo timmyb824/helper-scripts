@@ -13,10 +13,10 @@ CURRENT_USER=$(whoami)
 export CURRENT_USER
 
 # Array of privileged users
-export PRIVILEGED_USERS=("tbryant" "timmyb824" "remoter" "timothybryant" "timothy.bryant")
+export PRIVILEGED_USERS=("tbryant" "timmyb824" "remoter")
 
 # Set the desired Node.js version
-export NODE_VERSION="21.1.0"
+export NODE_VERSION="21.0.0"
 
 # Set the desired Python version
 export PYTHON_VERSION="3.11.0"
@@ -29,7 +29,7 @@ export AGE_SECRET_KEY="op://Personal/age-secret-key/credential"
 export AGE_SECRET_KEY_FILE="op://Personal/age-secret-key-file/age-master-key.txt"
 export AGE_SECRET_KEY_LOCATION="$HOME/.sops/age-master-key.txt"
 
-export CHEZMOI_CONFIG_FILE="op://Personal/chezmoi-toml-config-file/chezmoi.toml"
+export CHEZMOI_CONFIG_FILE="op://Personal/chezmoi-toml-config-file-linux/chezmoi.toml"
 export CHEZMOI_CONFIG_FILE_LOCATION="$HOME/.config/chezmoi/chezmoi.toml"
 
 export SOPS_VERSION="v3.8.1"
@@ -37,11 +37,11 @@ export AGE_VERSION="v1.1.1"
 
 export RUBY_VERSION="3.2.1"
 
-export WORK_HOSTNAME="timothy.bryant-SSM-MLX7N3TCYP"
+export PROMTAIL_VERSION="2.9.8"
 
 export ATUIN_USER="tbryant"
 
-export KUBECTL_VERSION="v1.25.0"
+export LOKI_URL="https://loki.local.timmybtech.com/loki/api/v1/push"
 
 ############# Global functions #############
 
@@ -55,9 +55,16 @@ is_privileged_user() {
     return 1 # The user is not privileged
 }
 
+# TODO: remove if no issues with new one below it
+# # Function to get a list of packages from a Gist
+# get_package_list() {
+#     local package_list_name="$1"
+#     local gist_url="https://gist.githubusercontent.com/timmyb824/807597f33b14eceeb26e4e6f81d45962/raw/${package_list_name}"
 
-# source via init.sh
-# Function to get a list of packages from a Gist
+#     # Fetch the package list, remove comments, and trim whitespace
+#     curl -fsSL "$gist_url" | sed 's/#.*//' | awk '{$1=$1};1'
+# }
+
 get_package_list() {
     local package_list_name="$1"
     local gist_url=""
@@ -80,15 +87,6 @@ line_in_file() {
     grep -Fq -- "$line" "$file"
 }
 
-# Function to add a line to a file if it doesn't already exist
-add_line_to_file() {
-    local line="$1"
-    local file="$2"
-    if ! line_in_file "$line" "$file"; then
-        echo "$line" >>"$file"
-    fi
-}
-
 # Function to echo with color and newlines for visibility
 # 31=red, 32=green, 33=yellow, 34=blue, 35=purple, 36=cyan
 echo_with_color() {
@@ -104,6 +102,22 @@ get_os() {
     Darwin*) echo "MacOS" ;;
     *) echo "Unknown" ;;
     esac
+}
+
+get_os_distro() {
+    local RELEASE
+    local DISTRO
+    if command_exists lsb_release; then
+        RELEASE=$(lsb_release -cs)
+        DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+    elif command_exists cat; then
+        RELEASE=$(cat /etc/os-release | grep -oP '(?<=VERSION_CODENAME=).+' | tr -d '"')
+        DISTRO=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+    fi
+    if [ -z "$RELEASE" ]; then
+        exit_with_error "Could not determine the distribution codename. Exiting."
+    fi
+    echo "$DISTRO"
 }
 
 # Function to output an error message and exit
@@ -157,7 +171,7 @@ ask_yes_or_no() {
             return 1
             ;;
         *)
-            echo_with_color "32" "Please answer yes or no."
+            echo_with_color "$GREEN_COLOR" "Please answer yes or no."
             ;;
         esac
     done
@@ -234,10 +248,10 @@ add_brew_to_path() {
     # Determine the system architecture for the correct Homebrew path
     local BREW_PREFIX
     local BREW_EXECUTABLE
-    if [[ "$(uname -m)" == "arm64" ]]; then
-        BREW_PREFIX="/opt/homebrew/bin"
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        BREW_PREFIX="/home/linuxbrew/.linuxbrew/bin"
     else
-        BREW_PREFIX="/usr/local/bin"
+        echo_with_color "33" "Unsupported architecture: $(uname -m)"
     fi
     BREW_EXECUTABLE="${BREW_PREFIX}/brew"
 
@@ -252,5 +266,3 @@ add_brew_to_path() {
         echo_with_color "33" "Homebrew is not installed at ${BREW_PREFIX}."
     fi
 }
-
-
