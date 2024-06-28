@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source necessary utilities
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # Function to install Promtail
 install_promtail() {
@@ -51,7 +51,7 @@ add_promtail_to_adm_group() {
 }
 
 configure_promtail() {
-    local LOKI_URL="$LOKI_URL" # Assuming you pass the Loki URL as the first argument
+    local LOKI_URL="$LOKI_URL"
 
     # Check if a LOKI_URL is provided
     if [ -z "$LOKI_URL" ]; then
