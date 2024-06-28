@@ -30,10 +30,10 @@ check_firewalld() {
 add_port() {
   local port=$1
   local zone=$2
-  sudo firewall-cmd --zone="$zone" --add-port="$port" --permanent
+  firewall-cmd --zone="$zone" --add-port="$port" --permanent
   if [ $? -eq 0 ]; then
     echo_with_color $GREEN "Successfully added port $port to zone $zone."
-    sudo firewall-cmd --reload
+    firewall-cmd --reload
   else
     echo_with_color $RED "Failed to add port $port to zone $zone."
   fi
@@ -43,12 +43,22 @@ add_port() {
 remove_port() {
   local port=$1
   local zone=$2
-  sudo firewall-cmd --zone="$zone" --remove-port="$port" --permanent
+  firewall-cmd --zone="$zone" --remove-port="$port" --permanent
   if [ $? -eq 0 ]; then
     echo_with_color $GREEN "Successfully removed port $port from zone $zone."
-    sudo firewall-cmd --reload
+    firewall-cmd --reload
   else
     echo_with_color $RED "Failed to remove port $port from zone $zone."
+  fi
+}
+
+# Function to list open ports in a zone
+list_ports() {
+  local zone=$1
+  echo_with_color $GREEN "Open ports in zone $zone:"
+  firewall-cmd --zone="$zone" --list-ports
+  if [ $? -ne 0 ]; then
+    echo_with_color $RED "Failed to list ports for zone $zone."
   fi
 }
 
@@ -62,8 +72,8 @@ fi
 check_firewalld
 
 # Ensure correct number of arguments
-if [ "$#" -ne 3 ]; then
-  echo_with_color $YELLOW "Usage: $0 {add|remove} <port/protocol> <zone>"
+if [ "$#" -lt 2 ]; then
+  echo_with_color $YELLOW "Usage: $0 {add|remove|list} <port/protocol> <zone>"
   exit 1
 fi
 
@@ -75,13 +85,24 @@ zone=$3
 # Execute appropriate action
 case $action in
   add)
+    if [ -z "$zone" ]; then
+      echo_with_color $YELLOW "Usage: $0 add <port/protocol> <zone>"
+      exit 1
+    fi
     add_port "$port" "$zone"
     ;;
   remove)
+    if [ -z "$zone" ]; then
+      echo_with_color $YELLOW "Usage: $0 remove <port/protocol> <zone>"
+      exit 1
+    fi
     remove_port "$port" "$zone"
     ;;
+  list)
+    list_ports "$port"
+    ;;
   *)
-    echo_with_color $YELLOW "Usage: $0 {add|remove} <port/protocol> <zone>"
+    echo_with_color $YELLOW "Usage: $0 {add|remove|list} <port/protocol> <zone>"
     exit 1
     ;;
 esac
