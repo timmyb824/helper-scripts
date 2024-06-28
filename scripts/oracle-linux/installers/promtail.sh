@@ -84,13 +84,7 @@ EOL
 }
 
 configure_promtail() {
-    local LOKI_URL="$LOKI_URL"
-
-    # Check if a LOKI_URL is provided
-    if [ -z "$LOKI_URL" ]; then
-        echo "LOKI_URL is not set."
-        return 1
-    fi
+    local LOKI_URL=$1
 
     # Use your function echo_with_color if it's defined, or just echo otherwise
     if command -v echo_with_color &>/dev/null; then
