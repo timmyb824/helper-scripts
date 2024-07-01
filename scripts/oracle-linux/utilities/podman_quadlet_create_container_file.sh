@@ -26,7 +26,7 @@ generate_systemd_unit() {
   fi
 }
 
-enable_systemd_service() {
+start_systemd_service() {
   local container_name="$1"
   systemctl --user daemon-reload
   if systemctl --user start "${container_name}.service"; then
@@ -49,5 +49,5 @@ check_service_status() {
 
 # Main script execution
 generate_systemd_unit "${CONTAINER_NAME}"
-enable_systemd_service "${CONTAINER_NAME}"
+start_systemd_service "${CONTAINER_NAME}"
 check_service_status "${CONTAINER_NAME}"
