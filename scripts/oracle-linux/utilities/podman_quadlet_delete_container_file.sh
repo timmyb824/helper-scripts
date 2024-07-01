@@ -11,16 +11,27 @@ SERVICE_NAME="$1"
 UNIT_FILE="$SERVICE_NAME.service"
 CONTAINER_FILE="$HOME/.config/containers/systemd/$SERVICE_NAME.container"
 
-# Stop the user service
-systemctl --user stop "$UNIT_FILE"
+if systemctl --user stop "$UNIT_FILE"; then
+    echo "Service $SERVICE_NAME has been stopped."
+else
+    echo "Service $SERVICE_NAME is not running."
+fi
 
 # Disable the user service
-systemctl --user disable "$UNIT_FILE"
+if systemctl --user disable "$UNIT_FILE"; then
+    echo "Service $SERVICE_NAME has been disabled."
+else
+    echo "Service $SERVICE_NAME is not enabled."
+fi
 
-rm -f "$CONTAINER_FILE"
+echo "Removing service and container files for $SERVICE_NAME."
+rm -f "$CONTAINER_FILE" || echo "Container file $CONTAINER_FILE does not exist."
 
 systemctl --user daemon-reload
-systemctl --user reset-failed "$UNIT_FILE"
+
+if systemctl --user reset-failed "$UNIT_FILE" 2>/dev/null; then
+    echo "Failed state for $SERVICE_NAME has been reset."
+fi
 
 # Stop and remove the container
 podman stop "$SERVICE_NAME" || echo "Container $SERVICE_NAME is not running."
