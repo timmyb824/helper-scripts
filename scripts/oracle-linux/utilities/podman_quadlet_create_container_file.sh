@@ -30,9 +30,9 @@ start_systemd_service() {
   local container_name="$1"
   systemctl --user daemon-reload
   if systemctl --user start "${container_name}.service"; then
-    echo "Successfully enabled systemd service for container: ${container_name}"
+    echo "Successfully started systemd service for container: ${container_name}"
   else
-    echo "Failed to enable systemd service for container: ${container_name}"
+    echo "Failed to start systemd service for container: ${container_name}"
     exit 1
   fi
 }
