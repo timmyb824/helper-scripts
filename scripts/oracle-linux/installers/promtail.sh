@@ -100,38 +100,37 @@ configure_promtail() {
 
     # Write the new Promtail configuration to the file
     sudo tee /etc/promtail/config.yml >/dev/null <<EOF
-    server:
-      http_listen_port: 9080
-      grpc_listen_port: 0
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
 
-    positions:
-      filename: /tmp/positions.yaml
+positions:
+  filename: /tmp/positions.yaml
 
-    clients:
-      - url: ${LOKI_URL}
-        external_labels:
-          host: $(hostname)
+clients:
+  - url: ${LOKI_URL}
+    external_labels:
+      host: $(hostname)
 
-    scrape_configs:
-
-    - job_name: system
-      static_configs:
+scrape_configs:
+  - job_name: system
+    static_configs:
       - targets:
           - localhost
         labels:
           job: syslog
           __path__: /var/log/messages
 
-    - job_name: system
-      static_configs:
+  - job_name: system
+    static_configs:
       - targets:
           - localhost
         labels:
           job: syslog
           __path__: /var/log/secure
 
-    - job_name: system
-      static_configs:
+  - job_name: system
+    static_configs:
       - targets:
           - localhost
         labels:
@@ -177,16 +176,26 @@ restart_promtail() {
     echo_with_color "$GREEN" "Promtail restarted."
 }
 
+install_podlet() {
+    if ! command_exists podlet; then
+        echo_with_color "$GREEN" "Installing Podlet..."
+        if command_exists cargo; then
+            cargo install podlet || echo_with_color "$RED" "Failed to install Podlet."
+        else
+            echo_with_color "$RED" "Cargo is not installed. Please install Rust and Cargo and try again."
+        fi
+    else
+        echo_with_color "$GREEN" "Podlet is already installed."
+    fi
+}
+
 if ! command_exists promtail; then
     install_promtail "$PROMTAIL_VERSION"
-
     create_promtail_user
-
     set_promtail_acls
-
     configure_promtail "http://logging.tailebee.ts.net:3100/loki/api/v1/push"
-
     restart_promtail
+    install_podlet
 else
     # check if the installed version is the same as the desired version
     if [ "$(promtail --version | grep 'promtail, version' | awk '{print $3}')" != "$PROMTAIL_VERSION" ]; then
