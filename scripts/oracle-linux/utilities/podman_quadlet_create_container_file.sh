@@ -39,10 +39,10 @@ enable_systemd_service() {
 
 check_service_status() {
   local container_name="$1"
-  if systemctl --user status "${container_name}.service"; then
-    echo "Successfully checked status of systemd service for container: ${container_name}"
+  if systemctl --user is-active "${container_name}.service"; then
+    echo "Container: ${container_name} is running"
   else
-    echo "Failed to check status of systemd service for container: ${container_name}"
+    echo "Container: ${container_name} is not running"
     exit 1
   fi
 }
