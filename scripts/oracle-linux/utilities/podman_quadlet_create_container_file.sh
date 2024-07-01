@@ -29,7 +29,7 @@ generate_systemd_unit() {
 enable_systemd_service() {
   local container_name="$1"
   systemctl --user daemon-reload
-  if systemctl --user enable --now "${container_name}.service"; then
+  if systemctl --user start "${container_name}.service"; then
     echo "Successfully enabled systemd service for container: ${container_name}"
   else
     echo "Failed to enable systemd service for container: ${container_name}"
