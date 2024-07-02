@@ -6,7 +6,6 @@ if [ -z "$1" ]; then
 fi
 
 UID=$(id -u)
-NETWORK_NAME="$1"
 SYSTEMD_USER_DIR="$HOME/.config/containers/systemd"
 SYSTEMD_USER_GENERATED_DIR="/run/user/${UID}/systemd/generator"
 
