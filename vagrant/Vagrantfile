@@ -4,9 +4,9 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "bento/oracle-9-arm64"
+  config.vm.box = "bento/ubuntu-22.04"
 
-  config.vm.synced_folder "/Users/timothybryant/DEV/homelab/multi-os-install-scripts", "/home/vagrant/multi-os-install-scripts"
+  config.vm.synced_folder "/home/tbryant/DEV/homelab/install-scripts", "/home/vagrant/install-scripts"
 
   # config.ssh.username = "vagrant"
   # config.ssh.private_key_path = "~/.vagrant.d/insecure_private_key"

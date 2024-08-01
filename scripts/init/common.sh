@@ -45,6 +45,18 @@ export LOKI_URL="https://loki.local.timmybtech.com/loki/api/v1/push"
 
 ############# Global functions #############
 
+msg_info() {
+    echo -e "\033[1;34m[INFO]\033[0m $1"
+}
+
+msg_ok() {
+    echo -e "\033[1;32m[OK]\033[0m $1"
+}
+
+msg_error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+}
+
 # Function to check if the current user is privileged
 is_privileged_user() {
     for user in "${PRIVILEGED_USERS[@]}"; do
