@@ -2,17 +2,6 @@
 
 source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
-# Function to print informational messages
-msg_info() {
-  local msg="$1"
-  echo -e "\033[1;34m[INFO] $msg\033[0m"
-}
-
-# Function to print success messages
-msg_ok() {
-  local msg="$1"
-  echo -e "\033[1;32m[OK] $msg\033[0m"
-}
 
 # Function to handle errors and revert changes
 handle_error() {

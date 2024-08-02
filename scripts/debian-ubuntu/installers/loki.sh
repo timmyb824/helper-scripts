@@ -1,28 +1,12 @@
 #!/usr/bin/env bash
 
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+
 set -eu
-
-# Function to print informational messages
-msg_info() {
-  local msg="$1"
-  echo -e "\033[1;34m[INFO] $msg\033[0m"
-}
-
-# Function to print success messages
-msg_ok() {
-  local msg="$1"
-  echo -e "\033[1;32m[OK] $msg\033[0m"
-}
-
-# Function to print error messages
-msg_err() {
-  local msg="$1"
-  echo -e "\033[1;31m[ERROR] $msg\033[0m"
-}
 
 # # Function to handle errors and cleanup
 # handle_error() {
-#   msg_err "An error occurred. Exiting script."
+#   msg_error "An error occurred. Exiting script."
 #   cleanup
 #   exit 1
 # }
@@ -42,7 +26,7 @@ LOKI_CONFIG_FILE="/etc/loki/config.yml"
 install_dependencies() {
   msg_info "Installing dependencies"
   sudo apt-get install -y wget || {
-    msg_err "Failed to install dependencies"
+    msg_error "Failed to install dependencies"
     exit 1
   }
 }
@@ -52,11 +36,11 @@ add_grafana_repo() {
   msg_info "Adding Grafana repository"
   mkdir -p /etc/apt/keyrings/
   wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor > /etc/apt/keyrings/grafana.gpg || {
-    msg_err "Failed to download Grafana GPG key"
+    msg_error "Failed to download Grafana GPG key"
     exit 1
   }
   echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list || {
-    msg_err "Failed to add Grafana repository"
+    msg_error "Failed to add Grafana repository"
     exit 1
   }
 }
@@ -65,11 +49,11 @@ add_grafana_repo() {
 install_loki() {
   msg_info "Installing Loki"
   sudo apt-get update || {
-    msg_err "Failed to update package lists"
+    msg_error "Failed to update package lists"
     exit 1
   }
   sudo apt-get install -y loki || {
-    msg_err "Failed to install Loki"
+    msg_error "Failed to install Loki"
     exit 1
   }
   msg_ok "Installed Loki"
@@ -144,11 +128,11 @@ EOL
 start_loki() {
   msg_info "Starting Loki"
   sudo systemctl daemon-reload || {
-    msg_err "Failed to reload systemd daemon"
+    msg_error "Failed to reload systemd daemon"
     exit 1
   }
   sudo systemctl start loki || {
-    msg_err "Failed to start Loki"
+    msg_error "Failed to start Loki"
     exit 1
   }
   msg_ok "Started Loki"
