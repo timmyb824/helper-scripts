@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Include the init script
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 # Check if font name is provided as argument
 if [ -z "$1" ]; then

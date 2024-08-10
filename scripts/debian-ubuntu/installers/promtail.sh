@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Source necessary utilities
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+
 
 # Function to install Promtail
 install_promtail() {

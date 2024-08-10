@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 create_ca_key_crt() {
   if [ ! -f "$HOME/ca.key" ] || [ ! -f "$HOME/ca.crt" ]; then
