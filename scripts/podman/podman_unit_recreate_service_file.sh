@@ -26,7 +26,7 @@ remove_container() {
 # Function to create and start new container with updated configuration
 recreate_container() {
     local project_name="$1"
-    podman-compose -f "$COMPOSE_FILE" -p "$project_name" up -d --force-recreate
+    podman-compose -f "$COMPOSE_FILE" --in-pod=0 -p "$project_name" up -d --force-recreate
 }
 
 # Function to regenerate systemd unit file
