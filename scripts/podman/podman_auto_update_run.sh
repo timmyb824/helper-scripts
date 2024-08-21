@@ -12,7 +12,8 @@ signal_healthchecks() {
     msg_info "Sending signal to Healthchecks.io"
     local status=$1
     local log_msg="cron for $HOSTNAME"
-    curl -m 10 --retry 5 --data-raw "${log_msg}" "${HEALTHCHECKS_URL}/${status}" >/dev/null 2>&1
+    curl -m 10 --retry 5 --data-raw "${log_msg}" "https://healthchecks.local.timmybtech.com/ping/${PODMAN_AUTO_UPDATE_IMAGES_CRON_UUID}/${status}" >/dev/null 2>&1
+    9835d4da-3a8c-44f6-bb3e-a7bc406cc81f
 }
 
 if [ ! -d "$(dirname "$log_file")" ]; then
