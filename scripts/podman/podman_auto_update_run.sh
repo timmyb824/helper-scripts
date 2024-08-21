@@ -7,6 +7,12 @@ log_file="$HOME/DEV/logs/podman-auto-update.log"
 logger() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a "$log_file"
 }
+# Function to send a signal to Healthchecks.io
+signal_healthchecks() {
+    local status=$1
+    local log_msg="cron for $HOSTNAME"
+    curl -m 10 --retry --data-raw "${log_msg}" 5 "${HEALTHCHECKS_URL}/${status}" >/dev/null 2>&1
+}
 
 if [ ! -d "$(dirname "$log_file")" ]; then
     msg_info "Creating log directory: $(dirname "$log_file")"
@@ -29,6 +35,7 @@ pending_updates=$(echo "$updates" | grep "pending")
 if [[ -z "$pending_updates" ]]; then
     msg_info "No updates available."
     logger "No updates available."
+    signal_healthchecks 0
 else
     msg_info "Updates available for the following images:"
     logger "Updates available for the following images:"
@@ -38,8 +45,10 @@ else
     if podman auto-update; then
         msg_ok "Podman auto-update completed successfully."
         logger "Podman auto-update completed successfully."
+        signal_healthchecks 0
     else
         msg_error "Podman auto-update failed."
         logger "Podman auto-update failed."
+        signal_healthchecks 1
     fi
 fi
