@@ -100,6 +100,7 @@ case $action in
       exit 1
     fi
     add_port "$port" "$zone"
+    restart_firewalld
     ;;
   remove)
     if [ -z "$zone" ]; then
@@ -107,6 +108,7 @@ case $action in
       exit 1
     fi
     remove_port "$port" "$zone"
+    restart_firewalld
     ;;
   list)
     list_ports "$port"
@@ -117,4 +119,3 @@ case $action in
     ;;
 esac
 
-restart_firewalld
