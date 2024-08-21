@@ -62,6 +62,16 @@ list_ports() {
   fi
 }
 
+# Function to restart firewalld
+restart_firewalld() {
+  sudo systemctl restart firewalld
+  if [ $? -eq 0 ]; then
+    echo_with_color $GREEN "Firewalld restarted."
+  else
+    echo_with_color $RED "Failed to restart firewalld."
+  fi
+}
+
 # Check if firewalld is installed
 if ! command_exists firewall-cmd; then
   echo_with_color $RED "Error: firewalld is not installed."
@@ -106,3 +116,5 @@ case $action in
     exit 1
     ;;
 esac
+
+restart_firewalld
