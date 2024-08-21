@@ -33,7 +33,7 @@ add_port() {
   sudo firewall-cmd --zone="$zone" --add-port="$port" --permanent
   if [ $? -eq 0 ]; then
     echo_with_color $GREEN "Successfully added port $port to zone $zone."
-    firewall-cmd --reload
+    sudo firewall-cmd --reload
   else
     echo_with_color $RED "Failed to add port $port to zone $zone."
   fi
@@ -46,7 +46,7 @@ remove_port() {
   sudo firewall-cmd --zone="$zone" --remove-port="$port" --permanent
   if [ $? -eq 0 ]; then
     echo_with_color $GREEN "Successfully removed port $port from zone $zone."
-    firewall-cmd --reload
+    sudo firewall-cmd --reload
   else
     echo_with_color $RED "Failed to remove port $port from zone $zone."
   fi
@@ -100,7 +100,7 @@ case $action in
       exit 1
     fi
     add_port "$port" "$zone"
-    restart_firewalld
+    # restart_firewalld
     ;;
   remove)
     if [ -z "$zone" ]; then
@@ -108,7 +108,7 @@ case $action in
       exit 1
     fi
     remove_port "$port" "$zone"
-    restart_firewalld
+    # restart_firewalld
     ;;
   list)
     list_ports "$port"
