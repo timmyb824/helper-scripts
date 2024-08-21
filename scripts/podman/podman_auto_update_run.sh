@@ -9,6 +9,7 @@ logger() {
 }
 # Function to send a signal to Healthchecks.io
 signal_healthchecks() {
+    msg_info "Sending signal to Healthchecks.io"
     local status=$1
     local log_msg="cron for $HOSTNAME"
     curl -m 10 --retry 5 --data-raw "${log_msg}" "${HEALTHCHECKS_URL}/${status}" >/dev/null 2>&1
