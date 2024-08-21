@@ -49,3 +49,5 @@ check_status() {
         enable_timer_and_service
     fi
 }
+
+check_status
