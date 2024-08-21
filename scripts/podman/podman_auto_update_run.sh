@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ../../init/init.sh
+source ../init/init.sh
 
 log_file="$HOME/DEV/logs/podman-auto-update.log"
 

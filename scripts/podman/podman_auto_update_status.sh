@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ../../init/init.sh
+source ../init/init.sh
 
 # Function to disable the timer and service
 disable_timer_and_service() {
