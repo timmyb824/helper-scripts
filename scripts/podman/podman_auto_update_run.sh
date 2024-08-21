@@ -11,7 +11,7 @@ logger() {
 signal_healthchecks() {
     local status=$1
     local log_msg="cron for $HOSTNAME"
-    curl -m 10 --retry --data-raw "${log_msg}" 5 "${HEALTHCHECKS_URL}/${status}" >/dev/null 2>&1
+    curl -m 10 --retry 5 --data-raw "${log_msg}" "${HEALTHCHECKS_URL}/${status}" >/dev/null 2>&1
 }
 
 if [ ! -d "$(dirname "$log_file")" ]; then
