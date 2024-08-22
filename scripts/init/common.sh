@@ -73,17 +73,6 @@ logger() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a "$log_file"
 }
 
-# Function to output an error message and exit
-exit_with_error() {
-    echo_with_color "31" "Error: $1" >&2
-    exit 1
-}
-
-# Function to check if a command exists
-command_exists() {
-    command -v "$1" &>/dev/null
-}
-
 # Function to check if the current user is privileged
 is_privileged_user() {
     for user in "${PRIVILEGED_USERS[@]}"; do
@@ -157,6 +146,17 @@ get_os_distro() {
         exit_with_error "Could not determine the distribution codename. Exiting."
     fi
     echo "$DISTRO"
+}
+
+# Function to output an error message and exit
+exit_with_error() {
+    echo_with_color "31" "Error: $1" >&2
+    exit 1
+}
+
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" &>/dev/null
 }
 
 # Function to add a directory to PATH if it's not already there
