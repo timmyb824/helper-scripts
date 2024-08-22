@@ -4,6 +4,23 @@ source ../init/init.sh
 
 log_file="$HOME/DEV/logs/podman-auto-update.log"
 
+msg_info() {
+    echo -e "\033[1;34m[INFO]\033[0m $1"
+}
+
+msg_ok() {
+    echo -e "\033[1;32m[OK]\033[0m $1"
+}
+
+msg_error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+}
+
+handle_error() {
+    msg_error "$1"
+    exit 1
+}
+
 logger() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a "$log_file"
 }
@@ -11,7 +28,7 @@ logger() {
 signal_healthchecks() {
     msg_info "Sending signal to Healthchecks.io"
     local status=$1
-    local log_msg="cron for $CURRENT_HOSTNAME"
+    local log_msg="cron for $HOSTNAME"
     curl -m 10 --retry 5 --data-raw "${log_msg}" "https://healthchecks.timmybtech.com/ping/${PODMAN_AUTO_UPDATE_IMAGES_CRON_UUID}/${status}" >/dev/null 2>&1
 }
 
