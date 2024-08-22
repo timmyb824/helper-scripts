@@ -1,6 +1,5 @@
+# THIS FILE IS RUN VIA CRON SO DON'T SOURCE FUNCTIONS FROM COMMON.SH
 #!/bin/bash
-
-source ../init/init.sh
 
 log_file="$HOME/DEV/logs/podman-auto-update.log"
 
@@ -24,6 +23,11 @@ handle_error() {
 logger() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a "$log_file"
 }
+
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
 # Function to send a signal to Healthchecks.io
 signal_healthchecks() {
     msg_info "Sending signal to Healthchecks.io"
