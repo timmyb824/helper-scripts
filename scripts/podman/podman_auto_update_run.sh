@@ -11,7 +11,7 @@ logger() {
 signal_healthchecks() {
     msg_info "Sending signal to Healthchecks.io"
     local status=$1
-    local log_msg="cron for $HOSTNAME"
+    local log_msg="cron for $CURRENT_HOSTNAME"
     curl -m 10 --retry 5 --data-raw "${log_msg}" "https://healthchecks.timmybtech.com/ping/${PODMAN_AUTO_UPDATE_IMAGES_CRON_UUID}/${status}" >/dev/null 2>&1
 }
 

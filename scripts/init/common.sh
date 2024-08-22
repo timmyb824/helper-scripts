@@ -12,6 +12,9 @@ export CYAN_COLOR="36"
 CURRENT_USER=$(whoami)
 export CURRENT_USER
 
+CURRENT_HOSTNAME=$(hostname)
+export CURRENT_HOSTNAME
+
 # Array of privileged users
 export PRIVILEGED_USERS=("tbryant" "timmyb824" "remoter")
 
