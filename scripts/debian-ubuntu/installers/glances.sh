@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 USER="$CURRENT_USER"
 WORKING_DIR="/home/${USER}/glances"

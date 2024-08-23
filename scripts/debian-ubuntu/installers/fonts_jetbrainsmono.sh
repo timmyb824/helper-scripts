@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 # Check if necessary commands are available
 if ! command_exists "curl" || ! command_exists "unzip"; then

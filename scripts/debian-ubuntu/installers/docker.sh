@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source necessary utilities
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 # Function to check if Docker is installed
 check_docker_installed() {

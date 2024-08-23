@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 # Define variables
 VERSION="1.8.1"

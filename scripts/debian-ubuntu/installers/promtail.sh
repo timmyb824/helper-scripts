@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 
 # Function to install Promtail

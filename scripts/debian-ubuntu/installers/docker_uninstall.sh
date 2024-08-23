@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 # Function to uninstall Docker
 uninstall_docker() {

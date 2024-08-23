@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 USER="$CURRENT_USER"
 PYENV_BIN="/home/${USER}/.pyenv/bin/pyenv"

@@ -2,7 +2,7 @@
 
 # Linux Tailscale Installation Script
 
-source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
+source "../../init/init.sh"
 
 # Function to install Tailscale on Linux
 install_headscale_linux() {
