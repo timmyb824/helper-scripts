@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$BASH_SOURCE")/../init/init.sh"
+source "$(dirname "$BASH_SOURCE")/../../../init/init.sh"
+
 OS=$(get_os)
+
 # Check if the OS is Linux
 if [ "$OS" != "Linux" ]; then
     echo_with_color "34" "This script is intended only for Linux. Exiting without running."
