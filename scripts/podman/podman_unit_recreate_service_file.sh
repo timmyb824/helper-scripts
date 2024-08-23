@@ -64,5 +64,4 @@ echo_color 32 "Regenerating and enabling the systemd unit file"
 regenerate_systemd_unit_file "$SERVICE_NAME"
 
 echo_color 32 "Service $SERVICE_NAME updated successfully"
-# List the systemd units to verify
-systemctl --user list-units 'container*'
+
