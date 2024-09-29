@@ -44,6 +44,9 @@ uninstall_alloy() {
     msg_info "Removing Grafana repository file..."
     sudo rm -i /etc/apt/sources.list.d/grafana.list || handle_error "Failed to remove Grafana repository file."
 
+    msg_info "Reloading daemon..."
+    sudo systemctl daemon-reload || handle_error "Failed to reload daemon."
+
     msg_ok "Alloy uninstallation completed successfully."
 }
 
