@@ -22,7 +22,7 @@ enable_and_configure_timer() {
     # Create a directory for the override if it doesn't exist
     sudo mkdir -p /etc/systemd/system/podman-auto-update.timer.d/
     # Create the override configuration file
-    echo -e "# Editing /etc/systemd/system/podman-auto-update.timer.d/override.conf\n# Anything between here and the comment below will become the new contents of the file\n[Timer]\nOnCalendar=Fri *-*-* 18:00" | sudo tee /etc/systemd/system/podman-auto-update.timer.d/override.conf > /dev/null
+    echo -e "# Editing /etc/systemd/system/podman-auto-update.timer.d/override.conf\n# Anything between here and the comment below will become the new contents of the file\n[Timer]\nOnCalendar=*-*-* 09:00/2" | sudo tee /etc/systemd/system/podman-auto-update.timer.d/override.conf > /dev/null
 
     # Reload the daemon to apply changes
     sudo systemctl daemon-reload
