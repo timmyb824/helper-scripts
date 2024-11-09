@@ -95,7 +95,7 @@ install_podman() {
         return 1
     fi
 
-    if ! chmod 777 "$config_dir/registries.conf"; then
+    if ! sudo chmod 777 "$config_dir/registries.conf"; then
         echo_with_color "31" "Failed to set permissions on $config_dir/registries.conf."
         return 1
     fi
@@ -131,7 +131,7 @@ install_cni_plugin() {
         local cni_plugin_url="http://archive.ubuntu.com/ubuntu/pool/universe/g/golang-github-containernetworking-plugins/containernetworking-plugins_1.1.1+ds1-3ubuntu0.23.10.2_amd64.deb"
         local cni_plugin_deb="/tmp/containernetworking-plugins_1.1.1+ds1-3ubuntu0.23.10.2_amd64.deb"
 
-        if ! wget -O "$cni_plugin_deb" "$cni_plugin_url"; then
+        if ! wget -4 -O "$cni_plugin_deb" "$cni_plugin_url"; then
             echo_with_color "31" "Failed to download CNI plugin package."
             return 1
         fi
