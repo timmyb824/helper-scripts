@@ -122,6 +122,7 @@ install_podman() {
         return 1
     fi
 
+    echo_with_color "31" "NOTE: May need to lower the privileged ports to 53 for DNS to work on some systems."
     echo_with_color "32" "Podman configuration completed successfully."
 }
 
