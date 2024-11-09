@@ -90,7 +90,7 @@ install_podman() {
     local config_dir="$HOME/.config/containers"
     mkdir -p "$config_dir"
 
-    if ! cp /etc/containers/registries.conf "$config_dir/"; then
+    if ! sudo cp /etc/containers/registries.conf "$config_dir/"; then
         echo_with_color "31" "Failed to copy registries.conf file to $config_dir."
         return 1
     fi
