@@ -86,12 +86,17 @@ install_podman() {
     echo_with_color "32" "Podman and podman-compose installed successfully."
 
     echo_with_color "33" "Configuring Podman..."
-    # Update registries to include docker.io
+
     local config_dir="$HOME/.config/containers"
     mkdir -p "$config_dir"
 
     if ! sudo cp /etc/containers/registries.conf "$config_dir/"; then
         echo_with_color "31" "Failed to copy registries.conf file to $config_dir."
+        return 1
+    fi
+
+    if ! chmod 777 "$config_dir/registries.conf"; then
+        echo_with_color "31" "Failed to set permissions on $config_dir/registries.conf."
         return 1
     fi
 
