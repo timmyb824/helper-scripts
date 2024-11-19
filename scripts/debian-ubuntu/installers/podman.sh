@@ -136,39 +136,43 @@ install_podman() {
     echo_with_color "32" "Podman configuration completed successfully."
 }
 
-# Function to upgrade Podman
 upgrade_podman() {
     echo_with_color "33" "Upgrading Podman..."
 
-    # First ensure the Kubic repository is properly configured
-    if [ ! -f /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list ]; then
-        echo_with_color "31" "Kubic repository configuration not found. Re-adding repository..."
-        # Add the repository for Podman from the Kubic project
-        if ! echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_22.04/ /' | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list; then
-            echo_with_color "31" "Failed to add the Podman repository."
-            return 1
-        fi
+    # Clean up old repository and key files
+    echo_with_color "33" "Cleaning up old repository and key files..."
+    sudo rm -f /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
+    sudo rm -f /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg
 
-        # Import the GPG key for the repository
-        if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
-            echo_with_color "31" "Failed to import the GPG key."
-            return 1
-        fi
+    # Add the repository and key using more secure method
+    echo_with_color "33" "Adding the repository and key using more secure method..."
+    if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg; then
+        echo_with_color "31" "Failed to import the GPG key."
+        return 1
     fi
 
-    # Update package lists
+    if ! echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_22.04/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list; then
+        echo_with_color "31" "Failed to add the Podman repository."
+        return 1
+    fi
+
+    echo_with_color "33" "Updating package lists..."
+    # Clean apt lists and update
+    sudo rm -rf /var/lib/apt/lists/*
+    sudo apt clean
+
     if ! sudo apt update; then
         echo_with_color "31" "Failed to update package lists."
         return 1
     fi
 
-    # Upgrade Podman
+    echo_with_color "33" "Upgrading Podman..."
     if ! sudo apt install --only-upgrade -y podman; then
         echo_with_color "31" "Failed to upgrade Podman."
         return 1
     fi
 
-    # Upgrade podman-compose
+    echo_with_color "33" "Upgrading podman-compose..."
     if command_exists pip; then
         if ! pip install --user --upgrade podman-compose; then
             echo_with_color "31" "Failed to upgrade podman-compose."
@@ -176,7 +180,7 @@ upgrade_podman() {
         fi
     fi
 
-    echo_with_color "32" "Podman upgrade completed successfully."
+    echo_with_color "32" "Podman upgrade completed successfully. New Version:"
     podman --version
 }
 
