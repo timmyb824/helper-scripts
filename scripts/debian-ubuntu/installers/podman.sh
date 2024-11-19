@@ -3,6 +3,22 @@
 # Source necessary utilities
 source "../../init/init.sh"
 
+# Parse command line arguments
+ACTION="install"  # default action
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --upgrade|-u)
+            ACTION="upgrade"
+            shift
+            ;;
+        *)
+            echo_with_color "31" "Unknown option: $1"
+            echo "Usage: $0 [--upgrade|-u]"
+            exit 1
+            ;;
+    esac
+done
+
 # Function to check if Podman is installed
 check_podman_installed() {
     if command_exists podman; then
@@ -40,12 +56,6 @@ install_podman() {
         echo_with_color "31" "sudo command is required but not found. Please install sudo first."
         return 1
     fi
-
-    # # Install Podman (initial attempt)
-    # if ! sudo apt-get update || ! sudo apt-get install -y podman; then
-    #     echo_with_color "31" "Failed to install Podman."
-    #     return 1
-    # fi
 
     # Instruction from: https://software.opensuse.org//download.html?project=devel%3Akubic%3Alibcontainers%3Aunstable&package=podman
     # Add the repository for Podman from the Kubic project
@@ -126,6 +136,33 @@ install_podman() {
     echo_with_color "32" "Podman configuration completed successfully."
 }
 
+# Function to upgrade Podman
+upgrade_podman() {
+    echo_with_color "33" "Upgrading Podman..."
+
+    # Update package lists
+    if ! sudo apt update; then
+        echo_with_color "31" "Failed to update package lists."
+        return 1
+    fi
+
+    # Upgrade Podman
+    if ! sudo apt install --only-upgrade -y podman; then
+        echo_with_color "31" "Failed to upgrade Podman."
+        return 1
+    fi
+
+    # Upgrade podman-compose
+    if command_exists pip; then
+        if ! pip install --user --upgrade podman-compose; then
+            echo_with_color "31" "Failed to upgrade podman-compose."
+            return 1
+        fi
+    fi
+
+    echo_with_color "32" "Podman upgrade completed successfully."
+    podman --version
+}
 
 install_cni_plugin() {
     if [[ "$(lsb_release -cs)" == "jammy" ]]; then
@@ -199,14 +236,26 @@ enable_and_start_root_podman_service() {
 }
 
 # Main script execution
-if check_podman_installed; then
-    echo_with_color "32" "Skipping installation as Podman is already installed."
+if [[ "$ACTION" == "upgrade" ]]; then
+    if ! check_podman_installed; then
+        echo_with_color "31" "Podman is not installed. Please install it first."
+        exit 1
+    fi
+    upgrade_podman
 else
-    echo_with_color "33" "Podman is not installed. Installing Podman..."
-    install_podman
-    install_cni_plugin
-    create_config_systemd_user_dir
-    symlink_podman_to_docker
-    enable_and_start_rootless_podman_service
-    # enable_and_start_root_podman_service
+    if check_podman_installed; then
+        echo_with_color "32" "Skipping installation as Podman is already installed."
+        echo_with_color "33" "Use --upgrade or -u option to upgrade Podman."
+    else
+        echo_with_color "33" "Installing Podman..."
+        install_podman
+        if [ $? -eq 0 ]; then
+            install_cni_plugin
+            create_config_systemd_user_dir
+            symlink_podman_to_docker
+            enable_and_start_rootless_podman_service
+            enable_and_start_root_podman_service
+            echo_with_color "32" "Podman installation and configuration completed successfully."
+        fi
+    fi
 fi
