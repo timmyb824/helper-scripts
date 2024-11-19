@@ -13,6 +13,7 @@ install_sops_oracle() {
     msg_info "Downloading sops binary for Linux..."
     SOPS_BINARY="sops-${SOPS_VERSION}-1.aarch64.rpm"
     SOPS_URL="https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/${SOPS_BINARY}"
+    msg_info "Downloading sops from: $SOPS_URL"
     if curl -LO "$SOPS_URL"; then
         sudo dnf install -y "$SOPS_BINARY"
         rm "$SOPS_BINARY"
