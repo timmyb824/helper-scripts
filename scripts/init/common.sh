@@ -35,8 +35,8 @@ export AGE_SECRET_KEY_LOCATION="$HOME/.sops/age-master-key.txt"
 export CHEZMOI_CONFIG_FILE="op://Personal/chezmoi-toml-config-file-linux/chezmoi.toml"
 export CHEZMOI_CONFIG_FILE_LOCATION="$HOME/.config/chezmoi/chezmoi.toml"
 
-export SOPS_VERSION="v3.8.1"
-export AGE_VERSION="v1.1.1"
+export SOPS_VERSION="v3.9.1"
+export AGE_VERSION="v1.2.0"
 
 export RUBY_VERSION="3.2.1"
 
