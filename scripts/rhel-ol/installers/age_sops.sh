@@ -13,7 +13,7 @@ install_sops_oracle() {
     fi
 
     msg_info "Installing sops with go..."
-    if $GO_BIN install github.com/getsops/sops/v3@latest; then
+    if $GO_BIN get -u go.mozilla.org/sops/v3/cmd/sops; then
         # Verify the installation
         if command_exists sops; then
             msg_ok "sops installed successfully on Linux."
