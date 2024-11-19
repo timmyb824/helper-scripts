@@ -9,13 +9,17 @@ install_sops_oracle() {
         return 0
     fi
     msg_info "Downloading sops binary for Linux..."
+    SOPS_VERSION="3.9.1"
     SOPS_BINARY="sops-${SOPS_VERSION}-1.aarch64.rpm"
-    SOPS_URL="https://github.com/getsops/sops/releases/download/${SOPS_VERSION}/${SOPS_BINARY}"
+    SOPS_URL="https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/${SOPS_BINARY}"
     msg_info "Downloading sops from: $SOPS_URL"
 
     if curl -LO "$SOPS_URL"; then
-        sudo dnf install -y "./${SOPS_BINARY}"
-        rm ./"$SOPS_BINARY"
+        if ! sudo dnf install -y "${SOPS_BINARY}"; then
+            msg_error "Error: Failed to install sops from the downloaded file."
+            return 1
+        fi
+        rm "$SOPS_BINARY"
         msg_ok "sops installed successfully on Linux."
     else
         msg_error "Error: Failed to download sops from the URL: $SOPS_URL"
@@ -24,13 +28,12 @@ install_sops_oracle() {
 }
 
 install_age_oracle() {
-    local GO_BIN="$(type -p go)"
-
     if command_exists age; then
         msg_info "age is already installed on Linux."
         return 0
     fi
 
+    GO_BIN="$(type -p go)"
     if ! command_exists "$GO_BIN"; then
         msg_error "Go is not installed. Please install Go and try again."
         return 1
