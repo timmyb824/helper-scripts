@@ -191,6 +191,18 @@ upgrade_podman() {
         return 1
     fi
 
+    echo_with_color "33" "Restarting Podman services..."
+    # Restart rootless podman service
+    systemctl --user daemon-reload
+    systemctl --user restart podman.socket podman.service || true
+
+    # Restart root podman service
+    sudo systemctl daemon-reload
+    sudo systemctl restart podman.socket podman.service || true
+
+    # Wait a moment for services to fully restart
+    sleep 5
+
     echo_with_color "33" "Upgrading podman-compose..."
     if command_exists pip; then
         if ! pip install --user --upgrade podman-compose; then
@@ -201,6 +213,11 @@ upgrade_podman() {
 
     echo_with_color "32" "Podman upgrade completed successfully. New Version:"
     podman --version
+
+    echo_with_color "33" "Verifying Podman socket API version..."
+    if ! podman system info >/dev/null 2>&1; then
+        echo_with_color "31" "Warning: Podman socket may not be running the latest version. You may need to log out and back in."
+    fi
 }
 
 install_cni_plugin() {
