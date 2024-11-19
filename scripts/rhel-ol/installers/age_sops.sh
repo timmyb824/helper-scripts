@@ -37,9 +37,27 @@ install_age_oracle() {
         return 1
     fi
 
+    # Ensure GOPATH is set and in PATH
+    if [ -z "$GOPATH" ]; then
+        export GOPATH=$HOME/go
+        msg_warn "GOPATH was not set. Setting to $GOPATH"
+    fi
+
+    # Add GOPATH/bin to PATH if not already present
+    if [[ ":$PATH:" != *":$GOPATH/bin:"* ]]; then
+        export PATH="$PATH:$GOPATH/bin"
+        msg_warn "Added $GOPATH/bin to PATH"
+    fi
+
     msg_info "Installing age with go..."
     if go install filippo.io/age/cmd/...@latest; then
-        msg_ok "age installed successfully on Linux."
+        # Verify the installation
+        if command_exists age; then
+            msg_ok "age installed successfully on Linux."
+        else
+            msg_error "age binary not found in PATH after installation"
+            return 1
+        fi
     else
         msg_error "Error: Failed to install age with go."
         return 1
@@ -58,4 +76,3 @@ fi
 
 install_sops_oracle
 install_age_oracle
-
