@@ -4,18 +4,18 @@
 source "../../init/init.sh"
 
 # Parse command line arguments
-ACTION="install"  # default action
+ACTION="install" # default action
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --upgrade|-u)
-            ACTION="upgrade"
-            shift
-            ;;
-        *)
-            echo_with_color "31" "Unknown option: $1"
-            echo "Usage: $0 [--upgrade|-u]"
-            exit 1
-            ;;
+    --upgrade | -u)
+        ACTION="upgrade"
+        shift
+        ;;
+    *)
+        echo_with_color "31" "Unknown option: $1"
+        echo "Usage: $0 [--upgrade|-u]"
+        exit 1
+        ;;
     esac
 done
 
@@ -65,7 +65,7 @@ install_podman() {
     fi
 
     # Import the GPG key for the repository
-    if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg > /dev/null; then
+    if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
         echo "Failed to import the GPG key for the Podman repository."
         return 1
     fi
@@ -139,6 +139,22 @@ install_podman() {
 # Function to upgrade Podman
 upgrade_podman() {
     echo_with_color "33" "Upgrading Podman..."
+
+    # First ensure the Kubic repository is properly configured
+    if [ ! -f /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list ]; then
+        echo_with_color "31" "Kubic repository configuration not found. Re-adding repository..."
+        # Add the repository for Podman from the Kubic project
+        if ! echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/xUbuntu_22.04/ /' | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list; then
+            echo_with_color "31" "Failed to add the Podman repository."
+            return 1
+        fi
+
+        # Import the GPG key for the repository
+        if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
+            echo_with_color "31" "Failed to import the GPG key."
+            return 1
+        fi
+    fi
 
     # Update package lists
     if ! sudo apt update; then
