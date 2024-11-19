@@ -139,6 +139,18 @@ install_podman() {
 upgrade_podman() {
     echo_with_color "33" "Upgrading Podman..."
 
+    # Initial system cleanup
+    echo_with_color "33" "Performing initial system cleanup..."
+    if ! sudo apt autoremove -y; then
+        echo_with_color "31" "Failed to perform autoremove."
+        return 1
+    fi
+
+    if ! sudo apt autoclean; then
+        echo_with_color "31" "Failed to perform autoclean."
+        return 1
+    fi
+
     # Clean up old repository and key files
     echo_with_color "33" "Cleaning up old repository and key files..."
     sudo rm -f /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
@@ -161,9 +173,16 @@ upgrade_podman() {
     sudo rm -rf /var/lib/apt/lists/*
     sudo apt clean
 
-    if ! sudo apt update; then
-        echo_with_color "31" "Failed to update package lists."
-        return 1
+    # Try update with a timeout
+    if ! timeout 300 sudo apt update; then
+        echo_with_color "31" "Failed to update package lists or operation timed out."
+        echo_with_color "33" "Attempting additional cleanup..."
+        sudo apt autoclean
+        sudo apt clean
+        if ! sudo apt update; then
+            echo_with_color "31" "Update failed even after additional cleanup."
+            return 1
+        fi
     fi
 
     echo_with_color "33" "Upgrading Podman..."
