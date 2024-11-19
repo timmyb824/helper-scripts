@@ -5,29 +5,24 @@ source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
 GO_BIN="$(type -p go)"
 
-# Function to install sops on Linux
 install_sops_oracle() {
     if command_exists sops; then
         msg_info "sops is already installed on Linux."
         return 0
     fi
-
-    msg_info "Installing sops with go..."
-    if $GO_BIN get -u go.mozilla.org/sops/v3/cmd/sops; then
-        # Verify the installation
-        if command_exists sops; then
-            msg_ok "sops installed successfully on Linux."
-        else
-            msg_error "sops binary not found in PATH after installation"
-            return 1
-        fi
+    msg_info "Downloading sops binary for Linux..."
+    SOPS_BINARY="sops-${SOPS_VERSION}-1.aarch64.rpm"
+    SOPS_URL="https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/${SOPS_BINARY}"
+    if curl -LO "$SOPS_URL"; then
+        sudo dnf install -y "$SOPS_BINARY"
+        rm "$SOPS_BINARY"
+        msg_ok "sops installed successfully on Linux."
     else
-        msg_error "Error: Failed to install sops with go."
+        msg_error "Error: Failed to download sops from the URL: $SOPS_URL"
         return 1
     fi
 }
 
-# Function to install age on Linux
 install_age_oracle() {
     if command_exists age; then
         msg_info "age is already installed on Linux."
