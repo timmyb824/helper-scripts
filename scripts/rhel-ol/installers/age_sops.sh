@@ -3,8 +3,6 @@
 # Source necessary utilities
 source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
-GO_BIN="$(type -p go)"
-
 install_sops_oracle() {
     if command_exists sops; then
         msg_info "sops is already installed on Linux."
@@ -17,7 +15,7 @@ install_sops_oracle() {
 
     if curl -LO "$SOPS_URL"; then
         sudo dnf install -y "./${SOPS_BINARY}"
-        rm "$SOPS_BINARY"
+        rm ./"$SOPS_BINARY"
         msg_ok "sops installed successfully on Linux."
     else
         msg_error "Error: Failed to download sops from the URL: $SOPS_URL"
@@ -26,9 +24,16 @@ install_sops_oracle() {
 }
 
 install_age_oracle() {
+    local GO_BIN="$(type -p go)"
+
     if command_exists age; then
         msg_info "age is already installed on Linux."
         return 0
+    fi
+
+    if ! command_exists "$GO_BIN"; then
+        msg_error "Go is not installed. Please install Go and try again."
+        return 1
     fi
 
     msg_info "Installing age with go..."
@@ -49,11 +54,6 @@ install_age_oracle() {
 # Check if system is aarch64
 if [[ $(uname -m) != "aarch64" ]]; then
     handle_error "This script is intended for aarch64 architecture only"
-fi
-
-if ! command_exists "$GO_BIN"; then
-    msg_error "Go is not installed. Please install Go and try again."
-    return 1
 fi
 
 install_sops_oracle
