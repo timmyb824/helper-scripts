@@ -3,7 +3,7 @@
 # Source necessary utilities
 source "$(dirname "$BASH_SOURCE")/../../init/init.sh"
 
-GO_BIN="/usr/local/go/bin/go"
+GO_BIN="$(type -p go)"
 
 # Function to install sops on Linux
 install_sops_oracle() {
