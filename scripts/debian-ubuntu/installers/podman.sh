@@ -66,6 +66,7 @@ install_podman() {
 
     # Import the GPG key for the repository
     if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
+    if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
         echo "Failed to import the GPG key for the Podman repository."
         return 1
     fi
@@ -222,8 +223,8 @@ upgrade_podman() {
 
 install_cni_plugin() {
     if [[ "$(lsb_release -cs)" == "jammy" ]]; then
-        local cni_plugin_url="http://archive.ubuntu.com/ubuntu/pool/universe/g/golang-github-containernetworking-plugins/containernetworking-plugins_1.1.1+ds1-3ubuntu0.23.10.2_amd64.deb"
-        local cni_plugin_deb="/tmp/containernetworking-plugins_1.1.1+ds1-3ubuntu0.23.10.2_amd64.deb"
+        local cni_plugin_url="http://archive.ubuntu.com/ubuntu/pool/universe/g/golang-github-containernetworking-plugins/containernetworking-plugins_0.9.1+ds1-1ubuntu0.1_amd64.deb"
+        local cni_plugin_deb="/tmp/containernetworking-plugins_0.9.1+ds1-1ubuntu0.1_amd64.deb"
 
         if ! wget -4 -O "$cni_plugin_deb" "$cni_plugin_url"; then
             echo_with_color "31" "Failed to download CNI plugin package."
