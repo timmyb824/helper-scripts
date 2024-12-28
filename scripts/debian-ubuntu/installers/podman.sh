@@ -78,7 +78,7 @@ install_podman() {
     fi
 
     # Install Podman
-    if ! sudo apt install -y podman; then
+    if ! sudo apt install -y podman podman-plugins; then
         echo "Failed to install Podman."
         return 1
     fi
