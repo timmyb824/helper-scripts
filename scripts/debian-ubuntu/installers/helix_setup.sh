@@ -63,7 +63,7 @@ install_helix() {
             ghq get https://github.com/helix-editor/helix
             cd "$(ghq root)/github.com/helix-editor/helix"
         else
-            git clone https://github.com:helix-editor/helix.git "$HOME/helix"
+            git clone https://github.com/helix-editor/helix.git "$HOME/helix"
             cd "$HOME/helix"
         fi
         cargo install --path helix-term --locker || msg_error "Failed to install Helix"
