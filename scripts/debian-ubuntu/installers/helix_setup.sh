@@ -22,6 +22,10 @@ msg_error() {
     exit 1
 }
 
+msg_warning() {
+    echo -e "${YELLOW}[WARNING] $1${NC}"
+}
+
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
@@ -48,12 +52,73 @@ install_helix() {
     if [ "$OS" = "macos" ]; then
         brew install helix || msg_error "Failed to install Helix"
     elif [ "$OS" = "linux" ]; then
-        sudo add-apt-repository ppa:maveonair/helix-editor -y || msg_error "Failed to add Helix repository"
+        # ONLY WORKS ON UBUNTU - LEAVING FOR REFERENCE
+        # sudo add-apt-repository ppa:maveonair/helix-editor -y || msg_error "Failed to add Helix repository"
+        # sudo apt update || msg_error "Failed to update apt"
+        # sudo apt install helix -y || msg_error "Failed to install Helix"
+        uninstall_helix_apt
         sudo apt update || msg_error "Failed to update apt"
-        sudo apt install helix -y || msg_error "Failed to install Helix"
+        sudo apt install build-essential gcc g++ -y || msg_error "Failed to install build tools"
+        if command_exists "ghq"; then
+            ghq get https://github.com/helix-editor/helix
+            cd "$(ghq root)/github.com/helix-editor/helix"
+        else
+            git clone https://github.com:helix-editor/helix.git "$HOME/helix"
+            cd "$HOME/helix"
+        fi
+        cargo install --path helix-term --locker || msg_error "Failed to install Helix"
     fi
 
     msg_success "Helix installed successfully"
+}
+
+# Uninstall Helix from APT
+uninstall_helix_apt() {
+    msg_info "Checking for APT installation of Helix..."
+    if dpkg -l | grep -q "helix"; then
+        msg_info "Removing APT version of Helix..."
+        sudo apt-get remove helix -y || msg_error "Failed to remove Helix"
+        sudo add-apt-repository --remove ppa:maveonair/helix-editor -y || msg_warning "Failed to remove Helix repository"
+        sudo apt update || msg_warning "Failed to update apt"
+        msg_success "APT version of Helix removed successfully"
+    else
+        msg_info "No APT installation of Helix found"
+    fi
+}
+
+# Upgrade Helix from source
+upgrade_helix_from_source() {
+    msg_info "Upgrading Helix from source..."
+
+    # First, uninstall APT version if it exists
+    uninstall_helix_apt
+
+    # Determine Helix source directory
+    HELIX_DIR=""
+    if command_exists "ghq"; then
+        HELIX_DIR="$(ghq root)/github.com/helix-editor/helix"
+    else
+        HELIX_DIR="$HOME/helix"
+    fi
+
+    # Update source code
+    if [ -d "$HELIX_DIR" ]; then
+        cd "$HELIX_DIR"
+        git pull || msg_error "Failed to update Helix source code"
+    else
+        if command_exists "ghq"; then
+            ghq get https://github.com/helix-editor/helix
+            cd "$(ghq root)/github.com/helix-editor/helix"
+        else
+            git clone https://github.com/helix-editor/helix.git "$HOME/helix"
+            cd "$HOME/helix"
+        fi
+    fi
+
+    # Build and install
+    cargo install --path helix-term --locked --force || msg_error "Failed to upgrade Helix"
+
+    msg_success "Helix upgraded successfully"
 }
 
 # Install npm packages
@@ -166,10 +231,10 @@ install_helix_gpt() {
 
     # Clone repository using ghq or git
     if command_exists "ghq"; then
-        ghq get git@github.com:leona/helix-gpt.git
+        ghq get https://github.com:leona/helix-gpt.git
         cd "$(ghq root)/github.com/leona/helix-gpt"
     else
-        git clone git@github.com:leona/helix-gpt.git "$HOME/helix-gpt"
+        git clone https://github.com:leona/helix-gpt.git "$HOME/helix-gpt"
         cd "$HOME/helix-gpt"
     fi
 
@@ -219,6 +284,9 @@ main() {
         ;;
     --deps-only)
         install_dependencies
+        ;;
+    --upgrade-helix)
+        upgrade_helix_from_source
         ;;
     *)
         install_helix
