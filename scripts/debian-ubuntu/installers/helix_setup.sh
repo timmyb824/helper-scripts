@@ -288,6 +288,9 @@ main() {
     --upgrade-helix)
         upgrade_helix_from_source
         ;;
+    --help)
+        echo "Usage: $0 [--helix-only | --deps-only | --upgrade-helix | --help]"
+        ;;
     *)
         install_helix
         install_dependencies
