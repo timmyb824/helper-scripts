@@ -41,22 +41,19 @@ get_os() {
 
 # Install Helix editor
 install_helix() {
-    if command_exists "hx"; then
-        msg_success "Helix is already installed"
-        return
-    fi
-
     msg_info "Installing Helix editor..."
     OS=$(get_os)
 
     if [ "$OS" = "macos" ]; then
+        if command_exists "hx"; then
+            msg_success "Helix is already installed"
+            return
+        fi
         brew install helix || msg_error "Failed to install Helix"
     elif [ "$OS" = "linux" ]; then
-        # ONLY WORKS ON UBUNTU - LEAVING FOR REFERENCE
-        # sudo add-apt-repository ppa:maveonair/helix-editor -y || msg_error "Failed to add Helix repository"
-        # sudo apt update || msg_error "Failed to update apt"
-        # sudo apt install helix -y || msg_error "Failed to install Helix"
+        # First, uninstall any APT version
         uninstall_helix_apt
+
         sudo apt update || msg_error "Failed to update apt"
         sudo apt install build-essential gcc g++ -y || msg_error "Failed to install build tools"
         if command_exists "ghq"; then
@@ -66,7 +63,7 @@ install_helix() {
             git clone https://github.com/helix-editor/helix.git "$HOME/helix"
             cd "$HOME/helix"
         fi
-        cargo install --path helix-term --locker || msg_error "Failed to install Helix"
+        cargo install --path helix-term --locked || msg_error "Failed to install Helix"
     fi
 
     msg_success "Helix installed successfully"
