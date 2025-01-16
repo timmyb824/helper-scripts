@@ -228,7 +228,7 @@ install_helix_gpt() {
 
     # Clone repository using ghq or git
     if command_exists "ghq"; then
-        ghq get https://github.com:leona/helix-gpt.git
+        ghq get https://github.com/leona/helix-gpt.git
         cd "$(ghq root)/github.com/leona/helix-gpt"
     else
         git clone https://github.com:leona/helix-gpt.git "$HOME/helix-gpt"
