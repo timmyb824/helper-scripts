@@ -246,7 +246,9 @@ install_helix_gpt() {
 install_rust_components() {
     msg_info "Installing Rust components..."
     rustup component add rust-analyzer
+    cargo install erg
     msg_success "Rust components installed successfully"
+
 }
 
 # Install Ruby components
