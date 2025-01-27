@@ -66,7 +66,6 @@ install_podman() {
 
     # Import the GPG key for the repository
     if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
-    if ! curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg >/dev/null; then
         echo "Failed to import the GPG key for the Podman repository."
         return 1
     fi
