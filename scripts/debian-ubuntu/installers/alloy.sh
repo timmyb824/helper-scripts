@@ -77,8 +77,19 @@ configure_alloy() {
             sudo mv /etc/alloy/config.alloy /etc/alloy/config.alloy.orig
         fi
 
+        # Check for both .yaml and .yml config files
+        local promtail_config=""
+        if [ -f "/etc/promtail/config.yaml" ]; then
+            promtail_config="/etc/promtail/config.yaml"
+        elif [ -f "/etc/promtail/config.yml" ]; then
+            promtail_config="/etc/promtail/config.yml"
+        else
+            msg_error "No Promtail configuration file found at /etc/promtail/config.yaml or /etc/promtail/config.yml"
+            return 1
+        fi
+
         msg_info "Converting Promtail config to Alloy format..."
-        sudo alloy convert --source-format=promtail --output=/etc/alloy/config.alloy /etc/promtail/config.yaml
+        sudo alloy convert --source-format=promtail --output=/etc/alloy/config.alloy "$promtail_config"
 
         msg_info "Stopping and disabling Promtail..."
         sudo systemctl stop promtail
