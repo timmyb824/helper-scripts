@@ -138,7 +138,7 @@ loki.write "default" {
         url = "${LOKI_URL}"
     }
     external_labels = {
-        host = "\$(hostname)",
+        host = "$(hostname)",
     }
 }
 EOF
