@@ -24,8 +24,8 @@ uninstall_podman() {
     echo_with_color "$GREEN_COLOR" "Podman uninstalled successfully."
 
     # Remove podman-compose
-    if command_exists pip; then
-        if ! pip uninstall -y podman-compose; then
+    if command_exists uv; then
+        if ! uv tool uninstall podman-compose; then
             echo_with_color "$RED_COLOR" "Failed to uninstall podman-compose."
             return 1
         fi
@@ -43,14 +43,14 @@ uninstall_podman() {
     fi
 
     # remove systemd user unit files (if uninstalling/reinstalling leaving these may help restart the containers)
-#    local systemd_dir="$HOME/.config/systemd"
-#    if [[ -d "$systemd_dir" ]]; then
-#      if ! rm -rf "$systemd_dir"; then
-#          echo_with_color "$RED_COLOR" "Failed to remove systemd user unit files."
-#          return 1
-#      fi
-#      echo_with_color "$GREEN_COLOR" "Systemd user unit files removed successfully."
-#    fi
+    #    local systemd_dir="$HOME/.config/systemd"
+    #    if [[ -d "$systemd_dir" ]]; then
+    #      if ! rm -rf "$systemd_dir"; then
+    #          echo_with_color "$RED_COLOR" "Failed to remove systemd user unit files."
+    #          return 1
+    #      fi
+    #      echo_with_color "$GREEN_COLOR" "Systemd user unit files removed successfully."
+    #    fi
 
     # Disable lingering for the user
     if ! sudo loginctl disable-linger "$USER"; then
