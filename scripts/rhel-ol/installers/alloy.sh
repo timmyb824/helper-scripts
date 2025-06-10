@@ -100,69 +100,60 @@ configure_alloy() {
 
         sudo tee /etc/alloy/config.alloy >/dev/null <<EOF
 local.file_match "system" {
-    path_targets = [{
-        __address__ = "localhost",
-        __path__    = "/var/log/messages",
-        job         = "syslog",
-    }]
-}
-
-local.file_match "system" {
-    path_targets = [{
-        __address__ = "localhost",
-        __path__    = "/var/log/secure",
-        job         = "syslog",
-    }]
+  path_targets = [
+    {
+      __address__ = "localhost",
+      __path__    = "/var/log/messages",
+      job         = "syslog",
+    },
+    {
+      __address__ = "localhost",
+      __path__    = "/var/log/secure",
+      job         = "syslog",
+    },
+    {
+      __address__ = "localhost",
+      __path__    = "/var/log/crowdsec.log",
+      job         = "syslog",
+    },
+    {
+      __address__ = "localhost",
+      __path__    = "/var/log/crowdsec_api.log",
+      job         = "syslog",
+    },
+    {
+      __address__ = "localhost",
+      __path__    = "/var/log/crowdsec-firewall-bouncer.log",
+      job         = "syslog",
+    },
+  ]
 }
 
 loki.source.file "system" {
-    targets               = local.file_match.system.targets
-    forward_to            = [loki.write.default.receiver]
-    legacy_positions_file = "/tmp/positions.yaml"
-}
-
-local.file_match "system" {
-    path_targets = [{
-        __address__ = "localhost",
-        __path__    = "/var/log/crowdsec.log",
-        job         = "syslog",
-    }]
-}
-
-local.file_match "system" {
-    path_targets = [{
-        __address__ = "localhost",
-        __path__    = "/var/log/crowdsec_api.log",
-        job         = "syslog",
-    }]
-}
-
-local.file_match "system" {
-    path_targets = [{
-        __address__ = "localhost",
-        __path__    = "/var/log/crowdsec-firewall-bouncer.log",
-        job         = "syslog",
-    }]
+  targets               = local.file_match.system.targets
+  forward_to            = [loki.write.default.receiver]
+  legacy_positions_file = "/tmp/positions.yaml"
 }
 
 discovery.relabel "journal" {
-    targets = []
+  targets = []
 
-    rule {
-        source_labels = ["__journal__systemd_unit"]
-        target_label  = "unit"
-    }
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
 }
 
-loki.source.journal "journal" {
-    max_age       = "12h0m0s"
-    path          = "/var/log/journal"
-    relabel_rules = discovery.relabel.journal.rules
-    forward_to    = [loki.write.default.receiver]
-    labels        = {
-        job = "systemd-journal",
-    }
-}
+// Uncomment this block only if /var/log/journal exists
+// loki.source.journal "journal" {
+//   max_age       = "12h0m0s",
+//   path          = "/var/log/journal",
+//   relabel_rules = discovery.relabel.journal.rules,
+//   forward_to    = [loki.write.default.receiver],
+//   labels = {
+//     job = "systemd-journal",
+//   },
+// }
 
 loki.write "default" {
     endpoint {
