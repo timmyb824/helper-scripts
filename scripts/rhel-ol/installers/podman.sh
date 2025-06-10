@@ -23,7 +23,7 @@ done
 # Function to check if Podman is installed
 check_podman_installed() {
     if command_exists podman; then
-        msg_warning "Podman is already installed."
+        msg_warn "Podman is already installed."
         podman --version
         return 0
     else
@@ -39,7 +39,7 @@ initialize_python_uv() {
 
     export PATH="${HOME}/.local/bin:$PATH"
     if ! command_exists uv; then
-        msg_warning "uv is not installed. Please run uv.sh first."
+        msg_warn "uv is not installed. Please run uv.sh first."
         exit_with_error "uv installation required"
     fi
 }
@@ -56,7 +56,7 @@ install_podman() {
         exit_with_error "Failed to install Podman."
     fi
 
-    msg_warning "Configuring Podman..."
+    msg_warn "Configuring Podman..."
 
     local config_dir="$HOME/.config/containers"
     mkdir -p "$config_dir"
@@ -113,7 +113,7 @@ create_config_systemd_user_dir() {
 }
 
 symlink_podman_to_docker() {
-    msg_warning "Symlinking Podman to Docker..."
+    msg_warn "Symlinking Podman to Docker..."
     read -p "Do you want to symlink Podman to Docker? [y/N]: " response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         echo "Creating the symlink..."
@@ -121,7 +121,7 @@ symlink_podman_to_docker() {
             handle_error "Podman socket does not exist. Please ensure Podman is installed and running."
         fi
         if [ -e /var/run/docker.sock ] || [ -L /var/run/docker.sock ]; then
-            msg_warning "Docker socket already exists. Please remove or rename it before symlinking."
+            msg_warn "Docker socket already exists. Please remove or rename it before symlinking."
         fi
         if sudo ln -s /run/podman/podman.sock /var/run/docker.sock; then
             msg_ok "Podman symlinked to Docker successfully."
@@ -150,7 +150,7 @@ upgrade_podman() {
 # Main script execution
 if [[ "$ACTION" == "install" ]]; then
     if check_podman_installed; then
-        msg_warning "Skipping installation as Podman is already installed."
+        msg_warn "Skipping installation as Podman is already installed."
     else
         msg_info "Podman is not installed. Installing Podman..."
         install_podman
