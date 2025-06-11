@@ -57,16 +57,7 @@ uninstall_alloy() {
     msg_ok "Alloy has been completely removed from the system."
 }
 
-# Function to configure Alloy
-configure_alloy() {
-    local LOKI_URL="$LOKI_URL"
-
-    # Check if a LOKI_URL is provided
-    if [ -z "$LOKI_URL" ]; then
-        echo "LOKI_URL is not set."
-        return 1
-    fi
-
+handle_existing_promtail() {
     msg_info "Checking Promtail status..."
     if systemctl is-active --quiet promtail; then
         msg_info "Promtail is running. Proceeding with configuration conversion..."
@@ -83,22 +74,30 @@ configure_alloy() {
         elif [ -f "/etc/promtail/config.yml" ]; then
             promtail_config="/etc/promtail/config.yml"
         else
-            msg_error "No Promtail configuration file found at /etc/promtail/config.yaml or /etc/promtail/config.yml"
-            return 1
+            handle_error "No Promtail configuration file found at /etc/promtail/config.yaml or /etc/promtail/config.yml"
         fi
-
-        msg_info "Converting Promtail config to Alloy format..."
-        sudo alloy convert --source-format=promtail --output=/etc/alloy/config.alloy "$promtail_config"
 
         msg_info "Stopping and disabling Promtail..."
         sudo systemctl stop promtail
         sudo systemctl disable promtail
     else
-        msg_info "Promtail is not running. Creating new Alloy configuration..."
+        msg_info "Promtail is not running"
+    fi
+}
 
-        sudo mkdir -p /etc/alloy
+# Function to configure Alloy
+configure_alloy() {
+    local LOKI_URL="$LOKI_URL"
 
-        sudo tee /etc/alloy/config.alloy >/dev/null <<EOF
+    # Check if a LOKI_URL is provided
+    if [ -z "$LOKI_URL" ]; then
+        echo "LOKI_URL is not set."
+        return 1
+    fi
+
+    sudo mkdir -p /etc/alloy
+
+    sudo tee /etc/alloy/config.alloy >/dev/null <<EOF
 local.file_match "system" {
   path_targets = [
     {
@@ -164,7 +163,6 @@ loki.write "default" {
     }
 }
 EOF
-    fi
 }
 
 set_alloy_acls() {
@@ -242,6 +240,7 @@ start_alloy() {
 case "${1:-}" in
 "install")
     install_alloy
+    handle_existing_promtail
     set_alloy_acls
     start_alloy
     ;;
