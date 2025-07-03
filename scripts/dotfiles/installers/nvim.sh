@@ -4,12 +4,13 @@ source "$(dirname "$BASH_SOURCE")/../init/init.sh"
 
 
 install_nvim_linux() {
-    NVIM_RELEASE="nvim-linux64.tar.gz"
-    NVIM_BIN_LOCATION="/opt/nvim"
-    if curl -LO https://github.com/neovim/neovim/releases/latest/download/${NVIM_RELEASE}; then
+    NVIM_RELEASE="nvim-linux-x86_64.tar.gz"
+    NVIM_BIN_LOCATION="/opt/nvim-linux64"
+    if curl -LO https://github.com/neovim/neovim/releases/download/stable/${NVIM_RELEASE}; then
         sudo rm -rf $NVIM_BIN_LOCATION
         sudo tar -C /opt -xzf $NVIM_RELEASE
         sudo rm -rf $NVIM_RELEASE
+        sudo mv /opt/nvim-linux-x86_64 $NVIM_BIN_LOCATION
         echo_with_color "$GREEN_COLOR" "Neovim installed successfully on Linux."
     else
         echo_with_color "$RED_COLOR" "Error: The Neovim download failed."
